@@ -5,7 +5,7 @@ namespace App\Routes;
 class CustomerRoute {
 
   public function __construct($app) {
-    $app->get('/test', 'App\Controllers\CustomerController:test');
+    $app->get('/customers', 'App\Controllers\CustomerController:all');
   }
 
 }

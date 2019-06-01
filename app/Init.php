@@ -31,10 +31,24 @@ class Init {
   }
 
 
-  private function routes() {
-    return array(
-      new \App\Routes\CustomerRoute($this->getApp()),
-    );
+  private function routes() {    
+    $routes = null;
+
+    if (is_dir(APP_PATH . '/Routes')) {
+      $routes = scandir(APP_PATH . '/Routes');
+    }
+
+    $dump_routes = array();
+    if ($routes !== null && gettype($routes) === 'array'){
+      foreach ($routes as $route) {
+        if (strpos($route, '.php')) {
+          $route_namespace = 'App\\Routes\\' . rtrim($route, (substr($route, -4)));
+          array_push($dump_routes, new $route_namespace($this->getApp()));
+        }
+      }
+    }
+
+    return $dump_routes;
   }
   
 }

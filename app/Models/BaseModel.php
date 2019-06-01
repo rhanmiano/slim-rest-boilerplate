@@ -1,8 +1,13 @@
 <?php
 
+namespace App\Models;
 
-require_once 'includes/idiorm.php';
+use ORM;
 
-class BaseModel extends ORM {
-  
+class BaseModel extends ORM{
+
+  public function __construct() {
+    ORM::configure(\App\Config\Config::db());
+  }
+
 }
