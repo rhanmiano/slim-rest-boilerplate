@@ -2,20 +2,21 @@
 
 namespace App;
 
-class App {
+require_once('Constants.php');
+
+class Init {
 
   private $app;
 
   public function __construct() {
-    $app = new \Slim\App(\App\Config\Config::settings());
-    $this->app = $app;
+    $this->app = new \Slim\App(\App\Config\Config::slimSettings());
     $this->dependencies();
     $this->middleware();
-    $this->routes();
+    $this->routes();    
   }
 
 
-  protected function getApp() {
+  public function getApp() {
     return $this->app;
   }
 
@@ -31,7 +32,9 @@ class App {
 
 
   private function routes() {
-    return []; // Todo Add Routes Here
+    return array(
+      new \App\Routes\CustomerRoute($this->getApp()),
+    );
   }
   
 }

@@ -2,7 +2,8 @@
 
 namespace App;
 
-class Dependencies() {
+
+class Dependencies {
 
   private $container;
 
@@ -15,10 +16,9 @@ class Dependencies() {
 
 
   private function dependencies() {
-    $this->container['db'] = function($container) {
-      $settings = $container['settings']['db'];
-      $db = new \Pdo;
-    }
   }
 
+  // Inject dependencies into controllers
+  private function inject($app) {
+  }
 }

@@ -1,31 +1,28 @@
 <?php
 
 namespace App\Config;
+use PDO;
 
 class Config {
 
-  public static function config(){
-    return [
-      'settings' => [
+  public function slimSettings(){
+    return array(
+      'settings' => array(
         'displayErrorDetails' => true,
         'determineRouteBeforeAppMiddleware' => false,
         'routerCacheFile' => '',
-        'db' => self::db()
-      ]
-    ];
+      )
+    );
   }
 
-  private function db(){
-    return [
-      'driver' => 'mysql',
-      'host' => 'localhost',
-      'database' => 'ilista-demo',
-      'user' => 'root',
+  public function db(){
+    return array (
+      'connection_string' => 'mysql:host=localhost;dbname=my_database;charset=utf8mb4',
+      'username' => 'root',
       'password' => '',
-      'charset' => 'utf8',
-      'collation' => 'utf8_unicode_ci',
-      'prefix' => ''
-    ]
+      'return_result_sets' => false,
+      'error_mode' => PDO::ERRMODE_WARNING,
+    );
   }
 
 }

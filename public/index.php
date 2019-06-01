@@ -2,6 +2,6 @@
 
 require __DIR__  . '/../vendor/autoload.php';
 
-$app = (new App\App())->getApp();
+$app = (new App\Init())->getApp();
 
 $app->run();
