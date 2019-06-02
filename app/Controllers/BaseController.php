@@ -4,7 +4,13 @@ namespace App\Controllers;
 
 class BaseController{
 
-  public function __construct(){    
+  protected $validator;
 
+  public function __construct($validator){    
+    $this->validator = $validator;
+  }
+
+  public function getValidator(){
+    return $this->validator;
   }
 }

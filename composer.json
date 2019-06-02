@@ -2,7 +2,8 @@
     "require": {
         "slim/slim": "^3.12",
         "j4mie/idiorm": "^1.5",
-        "vlucas/phpdotenv": "^3.3"
+        "vlucas/phpdotenv": "^3.3",
+        "respect/validation": "^1.1"
     },
     "autoload": {
       "psr-4": {

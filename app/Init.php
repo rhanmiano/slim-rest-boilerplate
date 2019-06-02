@@ -12,7 +12,7 @@ class Init {
     $this->app = new \Slim\App(\App\Config\Config::slimSettings());
     $this->dependencies();
     $this->middleware();
-    $this->routes();    
+    $this->routes();
   }
 
 
