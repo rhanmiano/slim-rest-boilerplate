@@ -1,7 +1,7 @@
 <?php
 
 if (!defined('ROOT_PATH')) {
-  define('ROOT_PATH', $_SERVER['DOCUMENT_ROOT']);
+  define('ROOT_PATH', dirname(dirname(__FILE__)));
 }
 
 if (!defined('APP_PATH')) {
