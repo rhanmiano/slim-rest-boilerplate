@@ -40,13 +40,17 @@ class CustomerController extends BaseController{
 
 
   public function create(Request $request, Response $response, $args) {
-    $body_args = json_decode($request->getBody());
+    $body_args = json_decode($request->getBody());  
 
     $errors = [];
+
     $validation = $this->validator->validate($request, [
-      'name' => v::notEmpty(),
-      'email' => v::notEmpty(),
-      'age' => v::notEmpty()
+      'name' => v::noWhitespace()->notEmpty(),
+      'email' => v::noWhitespace()->notEmpty()->alpha(),
+      'age' => v::noWhitespace()->notEmpty()
     ]);
+
+    var_dump($validation);
+    die();
   }
 }
