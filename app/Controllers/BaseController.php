@@ -6,6 +6,11 @@ class BaseController{
 
   protected $validator;
 
+  protected $retval = array (
+    'status' => 'failed',
+    'message' => '',
+  );
+
   public function __construct($app){
     $this->validator = $app->get('validator');
   }
