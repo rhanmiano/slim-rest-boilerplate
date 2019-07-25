@@ -5,11 +5,10 @@ namespace App\Controllers;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use App\Controllers\BaseController;
-use App\Models\CustomerModel as Customers;
+use App\Models\CustomerModel;
 use Respect\Validation\Validator as v;
 
 class CustomerController extends BaseController{
-
   public function test(Request $request, Response $response, $args) {
 
     $response->write('Hello World');
@@ -18,19 +17,20 @@ class CustomerController extends BaseController{
 
   public function all(Request $request, Response $response, $args) {
 
-    $customers = new Customers();
-    $customers = $customers->getAllCustomers();
+    $customer_model = new CustomerModel();
 
-    if (!empty($customers)) {
+    $result = $customer_model->getAllCustomers();
+
+    if (!empty($result)) {
 
       $this->retval['status']    = 'success';
-      $this->retval['message']   = FTCHD_SUCC;
-      $this->retval['customers'] = $customers;
+      $this->retval['message']   = FETCH_SUCC;
+      $this->retval['customers'] = $result;
 
     } else {
 
       $this->retval['status']    = 'failed';
-      $this->retval['message']   = FTCHD_EMPTY;
+      $this->retval['message']   = FETCH_EMPTY;
       $this->retval['customers'] = [];
 
     }
@@ -47,20 +47,21 @@ class CustomerController extends BaseController{
   public function byId(Request $request, Response $response, $args) {
 
     $id = (int)$args['id'];
-    $customers = new Customers();
 
-    $customer = $customers->getCustomerById($id);
+    $customer_model = new CustomerModel();
 
-    if (!empty($customer)) {
+    $result = $customer_model->getCustomerById($id);
+
+    if (!empty($result)) {
 
       $this->retval['status']    = 'success';
-      $this->retval['message']   = FTCHD_SUCC;
-      $this->retval['customer'] = $customer;
+      $this->retval['message']   = FETCH_SUCC;
+      $this->retval['customer'] = $result;
 
     } else {
 
       $this->retval['status']    = 'failed';
-      $this->retval['message']   = FTCHD_EMPTY;
+      $this->retval['message']   = FETCH_EMPTY;
       $this->retval['customer'] = [];
 
     }
@@ -73,10 +74,9 @@ class CustomerController extends BaseController{
 
   }
 
-
   public function create(Request $request, Response $response, $args) {
 
-    $body_args = json_decode($request->getBody());  
+    $body_args = json_decode($request->getBody());
 
     $validation = $this->validator->validate($body_args, [
       'name' => v::notEmpty()->alpha(),
@@ -86,11 +86,116 @@ class CustomerController extends BaseController{
 
     if ($validation->failed()) {
 
-      $this->retval['status']    = 'failed';
-      $this->retval['message']   = VLD_ERR;
-      $this->retval['error']['message'] = $validation->getError();
+      $this->retval['status']           = 'failed';
+      $this->retval['message']          = VLD_ERR;
+      $this->retval['errors']['fields'] = $validation->getErrors();
+
+      $response = $response->withStatus(200)
+      ->withHeader('Content-type', 'application/json')
+      ->withJson($this->retval);
+
+      return $response;
 
     }
+
+    $customer_model = new CustomerModel();
+
+    $result = $customer_model->insertCustomer($body_args);
+
+    if ($result) {
+
+      $this->retval['status']  = 'success';
+      $this->retval['message'] = CREATE_SUCC;
+
+    } else {
+
+      $this->retval['status']  = 'failed';
+      $this->retval['message'] = CREATE_ERR;
+
+    }    
+
+    $response = $response->withStatus(200)
+      ->withHeader('Content-type', 'application/json')
+      ->withJson($this->retval);
+
+    return $response;
+
+  }
+
+  public function update(Request $request, Response $response, $args) {
+
+    $id = (int)$args['id'];
+    $body_args = json_decode($request->getBody());
+
+    $validation = $this->validator->validate($body_args, [
+      'name' => v::notEmpty()->alpha(),
+      'email' => v::noWhitespace()->notEmpty()->email(),
+      'age' => v::noWhitespace()->notEmpty()->numeric()
+    ]);
+
+    if ($validation->failed()) {
+
+      $this->retval['status']           = 'failed';
+      $this->retval['message']          = VLD_ERR;
+      $this->retval['errors']['fields'] = $validation->getErrors();
+
+      $response = $response->withStatus(200)
+      ->withHeader('Content-type', 'application/json')
+      ->withJson($this->retval);
+
+      return $response;
+
+    }
+
+    $customer_model = new CustomerModel();
+
+    $result = $customer_model->updateCustomer($id, $body_args);
+
+    if ($result) {
+
+      $this->retval['status']  = 'success';
+      $this->retval['message'] = UPDATE_SUCC;
+
+    } else {
+
+      $this->retval['status']  = 'failed';
+      $this->retval['message'] = UPDATE_ERR;
+
+    }    
+
+    $response = $response->withStatus(200)
+      ->withHeader('Content-type', 'application/json')
+      ->withJson($this->retval);
+
+    return $response;
+
+  }
+
+  public function delete(Request $request, Response $response, $args) {
+
+    $id = (int)$args['id'];
+
+    $customer_model = new CustomerModel();
+
+    $result = $customer_model->deleteCustomerById($id);
+
+    if ($result) {
+
+      $this->retval['status']  = 'success';
+      $this->retval['message'] = DELETE_SUCC;
+
+    } else {
+
+      $this->retval['status']  = 'failed';
+      $this->retval['message'] = DELETE_ERR;
+
+    }    
+
+    $response = $response->withStatus(200)
+      ->withHeader('Content-type', 'application/json')
+      ->withJson($this->retval);
+
+    return $response;
 
   }
 

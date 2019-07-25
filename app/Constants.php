@@ -1,6 +1,6 @@
 <?php
 
-// Paths
+/** PATHS **/
 if (!defined('ROOT_PATH')) {
   define('ROOT_PATH', dirname(dirname(__FILE__)));
 }
@@ -10,7 +10,7 @@ if (!defined('APP_PATH')) {
 }
 
 
-/** System messages **/
+/** SYSTEM MESSAGES **/
 
 // System errors
 if (!defined('SYS_ERR')) {
@@ -18,33 +18,47 @@ if (!defined('SYS_ERR')) {
 }
 
 // Fetch
-if (!defined('FTCHD_SUCC')) {
-  define('FTCHD_SUCC', 'Data fetched successfully.');
+if (!defined('FETCH_SUCC')) {
+  define('FETCH_SUCC', 'Data fetched successfully.');
 }
 
-if (!defined('FTCHD_EMPTY')) {
-  define('FTCHD_EMPTY', 'Nothing to be fetched.');
+if (!defined('FETCH_EMPTY')) {
+  define('FETCH_EMPTY', 'Nothing to be fetched.');
 }
 
-if (!defined('FTCHD_ERR')) {
-  define('FTCHD_ERR', 'Error in fetching data.');
+if (!defined('FETCH_ERR')) {
+  define('FETCH_ERR', 'Error fetching the data.');
 }
 
 // Create
-if (!defined('CRT_SUCC')) {
-  define('FTCHD_SUCC', 'Data inserted successfully.');
+if (!defined('CREATE_SUCC')) {
+  define('CREATE_SUCC', 'Data inserted successfully.');
 }
 
-if (!defined('CRT_ERR')) {
-  define('FTCHD_ERR', 'Error in inserting the data.');
+if (!defined('CREATE_ERR')) {
+  define('CREATE_ERR', 'Error inserting the data.');
 }
 
 
 // Update
+if (!defined('UPDATE_SUCC')) {
+  define('UPDATE_SUCC', 'Data updated successfully.');
+}
+
+if (!defined('UPDATE_ERR')) {
+  define('UPDATE_ERR', 'Error updating the data.');
+}
 
 // Delete
+if (!defined('DELETE_SUCC')) {
+  define('DELETE_SUCC', 'Data deleted successfully.');
+}
+
+if (!defined('DELETE_ERR')) {
+  define('DELETE_ERR', 'Error updating the data.');
+}
 
 // Validation
 if (!defined('VLD_ERR')) {
-  define('VLD_ERR', 'Validtion error');
+  define('VLD_ERR', 'Validation error');
 }
