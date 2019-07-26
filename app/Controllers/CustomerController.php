@@ -7,11 +7,14 @@ use Psr\Http\Message\ResponseInterface as Response;
 use App\Controllers\BaseController;
 use App\Models\CustomerModel;
 use Respect\Validation\Validator as v;
+use App\Helpers\UtilityHelper;
 
 class CustomerController extends BaseController{
   public function test(Request $request, Response $response, $args) {
 
-    $response->write('Hello World');
+    $helper = new UtilityHelper();
+
+    $helper->_hello();
 
   }
 
