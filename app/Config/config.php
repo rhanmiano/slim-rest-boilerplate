@@ -10,7 +10,7 @@ class Config {
     return array(
       'settings' => array(
         'displayErrorDetails' => true,
-        'determineRouteBeforeAppMiddleware' => false,
+        'determineRouteBeforeAppMiddleware' => true,
         'routerCacheFile' => '',
       )
     );

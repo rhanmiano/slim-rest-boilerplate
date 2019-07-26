@@ -62,3 +62,12 @@ if (!defined('DELETE_ERR')) {
 if (!defined('VLD_ERR')) {
   define('VLD_ERR', 'Validation error');
 }
+
+// Authentication
+if (!defined('EMAIL_NULL')) {
+  define('EMAIL_NULL', 'Username doesn\'t exist in the system');
+}
+
+if (!defined('PASSWORD_INVLD')) {
+  define('PASSWORD_INVLD', 'Invalid Password');
+}

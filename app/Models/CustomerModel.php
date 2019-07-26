@@ -15,7 +15,7 @@ class CustomerModel extends BaseModel {
     foreach($result as $key => $value) {
       unset($result[$key]['password']);  
     }
-    
+
     return $result;
 
   }
@@ -27,6 +27,18 @@ class CustomerModel extends BaseModel {
       ->find_array();
 
     unset($result[0]['password']); // do not include password in the result
+
+    return $result;
+
+  }
+
+  public function getCustomerByEmail($email) {
+
+    $result = ORM::for_table('customers')
+      ->where('email', $email)
+      ->find_array();
+
+    // unset($result[0]['password']); // do not include password in the result
 
     return $result;
 
@@ -97,5 +109,22 @@ class CustomerModel extends BaseModel {
 
     return $result;
 
+  }
+
+  public function emailExists($email) {
+
+    $result = ORM::for_table('Customers')
+      ->where('email', $email)
+      ->find_one();
+
+    if (sizeof($result) > 0) {
+      
+      return true;
+
+    } else {
+      
+      return false;
+
+    }
   }
 }

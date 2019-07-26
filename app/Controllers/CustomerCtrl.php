@@ -10,6 +10,7 @@ use Respect\Validation\Validator as v;
 use App\Helpers\UtilityHelper;
 
 class CustomerCtrl extends BaseCtrl{
+  
   public function test(Request $request, Response $response, $args) {
 
     $helper = new UtilityHelper();
@@ -20,9 +21,9 @@ class CustomerCtrl extends BaseCtrl{
 
   public function all(Request $request, Response $response, $args) {
 
-    $customer_model = new CustomerModel();
+    $customerModel = new CustomerModel();
 
-    $result = $customer_model->getAllCustomers();
+    $result = $customerModel->getAllCustomers();
 
     if (!empty($result)) {
 
@@ -51,9 +52,9 @@ class CustomerCtrl extends BaseCtrl{
 
     $id = (int)$args['id'];
 
-    $customer_model = new CustomerModel();
+    $customerModel = new CustomerModel();
 
-    $result = $customer_model->getCustomerById($id);
+    $result = $customerModel->getCustomerById($id);
 
     if (!empty($result)) {
 
@@ -102,9 +103,9 @@ class CustomerCtrl extends BaseCtrl{
 
     }
 
-    $customer_model = new CustomerModel();
+    $customerModel = new CustomerModel();
 
-    $result = $customer_model->insertCustomer($body_args);
+    $result = $customerModel->insertCustomer($body_args);
 
     if ($result['status']) {
 
@@ -152,9 +153,9 @@ class CustomerCtrl extends BaseCtrl{
 
     }
 
-    $customer_model = new CustomerModel();
+    $customerModel = new CustomerModel();
 
-    $result = $customer_model->updateCustomer($id, $body_args);
+    $result = $customerModel->updateCustomer($id, $body_args);
 
     if ($result) {
 
@@ -180,9 +181,9 @@ class CustomerCtrl extends BaseCtrl{
 
     $id = (int)$args['id'];
 
-    $customer_model = new CustomerModel();
+    $customerModel = new CustomerModel();
 
-    $result = $customer_model->deleteCustomerById($id);
+    $result = $customerModel->deleteCustomerById($id);
 
     if ($result) {
 
