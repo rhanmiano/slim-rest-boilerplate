@@ -11,6 +11,11 @@ class CustomerModel extends BaseModel {
 
     $result = ORM::for_table('customers')->find_array();
 
+    // do not include password in the result
+    foreach($result as $key => $value) {
+      unset($result[$key]['password']);  
+    }
+    
     return $result;
 
   }
@@ -21,25 +26,48 @@ class CustomerModel extends BaseModel {
       ->where('id', $id)
       ->find_array();
 
+    unset($result[0]['password']); // do not include password in the result
+
     return $result;
 
   }
 
   public function insertCustomer($args) {
 
+    $errors = [];
     // Sample of executing raw query
     $qry1 = "
       INSERT INTO customers 
-      (name, email, age)
-      VALUES (:name, :email, :age) 
+      (name, password, email, age)
+      VALUES (:name, :password, :email, :age) 
     ";
 
-    $result = ORM::raw_execute($qry1, (array) $args);
+    $qry_params = (array) $args;
+    $qry_params['password'] = password_hash($qry_params['password'], PASSWORD_BCRYPT, array('cost' => 12));
+
+    try {
+
+      $result['status'] = ORM::raw_execute($qry1, $qry_params); 
+
+    } catch (PDOException $e) {
+
+      $errors[] = $e->getMessages;
+
+    }
 
     // If ever we need last inserted id
     $id = ORM::get_db()->lastInsertId();
 
-    return $result;
+    if (sizeof($errors) > 0) { // with errors
+    
+      $result['status'] = false;
+      $result['errors'] = $errors;
+
+    } else {
+      
+      return $result;
+
+    }
 
   }
 

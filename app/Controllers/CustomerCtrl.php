@@ -4,12 +4,12 @@ namespace App\Controllers;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
-use App\Controllers\BaseController;
+use App\Controllers\BaseCtrl;
 use App\Models\CustomerModel;
 use Respect\Validation\Validator as v;
 use App\Helpers\UtilityHelper;
 
-class CustomerController extends BaseController{
+class CustomerCtrl extends BaseCtrl{
   public function test(Request $request, Response $response, $args) {
 
     $helper = new UtilityHelper();
@@ -59,7 +59,7 @@ class CustomerController extends BaseController{
 
       $this->retval['status']    = 'success';
       $this->retval['message']   = FETCH_SUCC;
-      $this->retval['customer'] = $result;
+      $this->retval['customer'] = $result[0];
 
     } else {
 
@@ -82,9 +82,10 @@ class CustomerController extends BaseController{
     $body_args = json_decode($request->getBody());
 
     $validation = $this->validator->validate($body_args, [
-      'name' => v::notEmpty()->alpha(),
-      'email' => v::noWhitespace()->notEmpty()->email(),
-      'age' => v::noWhitespace()->notEmpty()->numeric()
+      'name'     => v::notEmpty()->alpha(),
+      'password' => v::noWhitespace()->notEmpty(),
+      'email'    => v::noWhitespace()->notEmpty()->email(),
+      'age'      => v::noWhitespace()->notEmpty()->numeric()
     ]);
 
     if ($validation->failed()) {
@@ -105,7 +106,7 @@ class CustomerController extends BaseController{
 
     $result = $customer_model->insertCustomer($body_args);
 
-    if ($result) {
+    if ($result['status']) {
 
       $this->retval['status']  = 'success';
       $this->retval['message'] = CREATE_SUCC;
@@ -114,6 +115,7 @@ class CustomerController extends BaseController{
 
       $this->retval['status']  = 'failed';
       $this->retval['message'] = CREATE_ERR;
+      $this->retval['errors'] = $result['errors'];
 
     }    
 

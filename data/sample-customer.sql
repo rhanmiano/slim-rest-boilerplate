@@ -7,6 +7,7 @@ DROP TABLE IF EXISTS `customers`;
 CREATE TABLE `customers` (
   `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
+  `password` VARCHAR(255) NOT NULL,
   `email` varchar(32) NOT NULL,
   `age` int(3) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,

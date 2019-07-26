@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-class BaseController{
+class BaseCtrl{
 
   protected $validator;
 
