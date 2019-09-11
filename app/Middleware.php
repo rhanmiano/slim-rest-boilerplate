@@ -25,7 +25,7 @@ class Middleware {
 
     $this->app->add(new JwtAuthentication([
       "attribute" => "jwt",
-      "path" => "/",
+      // "path" => "/public/hello",
       "algorithm" => getenv('JWT_ALGO'),
       "secret" => getenv('SECRET_KEY'),
       "error" => function ($request, $response, $arguments) {
@@ -39,10 +39,6 @@ class Middleware {
           'ignore' => ["/public/login"]
         ])
       ]
-      // "before" => function ($request, $arguments) {
-      //     $user = \App\Models\User::find($arguments['decoded']['sub']);
-      //     return $request->withAttribute("user", $user);
-      // }
     ]));
 
     /**
