@@ -71,3 +71,7 @@ if (!defined('EMAIL_NULL')) {
 if (!defined('PASSWORD_INVLD')) {
   define('PASSWORD_INVLD', 'Invalid Password');
 }
+
+if (!defined('LOGIN_SUCC')) {
+  define('LOGIN_SUCC', 'You\'ve login successfully');
+}
