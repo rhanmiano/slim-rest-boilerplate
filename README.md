@@ -5,7 +5,6 @@ Create restful apis with a bliss using SlimPHP. Inspired by [crankedapps' slim-r
  - SlimPHP 3
  - Idiorm(ORM)
  - Dotenv
- - CSRF Protection
  - JWT Authentication
  - Respect Validation
  - Monolog
@@ -20,8 +19,7 @@ Create restful apis with a bliss using SlimPHP. Inspired by [crankedapps' slim-r
  - [X] Dotenv
  - [X] Idiorm Sample CRUD fns
  - [X] Respect Validation
- - [ ] CSRF
- - [ ] JWT Authentication
+ - [X] JWT Authentication
  - [ ] Monolog
  - [ ] PHPUnit
  
