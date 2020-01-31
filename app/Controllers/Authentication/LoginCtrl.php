@@ -79,6 +79,7 @@ class LoginCtrl extends BaseCtrl {
     $token = $this->tokenCreate($customer[0]);
 
     $this->retval['status']  = 'success';
+    $this->retval['message'] = "You've logged in successfully";
     $this->retval['token']   = $token['token'];
     $this->retval['expires'] = $token['expires'];
 
@@ -92,7 +93,7 @@ class LoginCtrl extends BaseCtrl {
 
   public function tokenCreate($data) {
 
-    $expires = new \DateTime("+".getenv('EXPIRES')." minutes"); // token expiration
+    $expires = new \DateTime("+".getenv('JWT_EXPIRES')." minutes"); // token expiration
 
     $payload = [
       "iat" => (new \DateTime())->getTimeStamp(), // initialized unix timestamp
@@ -100,7 +101,7 @@ class LoginCtrl extends BaseCtrl {
       "sub" => $data // internal user identifier
     ];
 
-    $token = JWT::encode($payload, getenv('SECRET_KEY') , getenv('ALGO'));
+    $token = JWT::encode($payload, getenv('JWT_SECRET') , getenv('JWT_ALGO'));
     
     return [
       'token' => $token,
