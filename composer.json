@@ -1,10 +1,10 @@
 {
     "require": {
         "slim/slim": "^3.12",
-        "j4mie/idiorm": "^1.5",
         "vlucas/phpdotenv": "^3.3",
         "respect/validation": "^1.1",
-        "tuupola/slim-jwt-auth": "^2.4"
+        "tuupola/slim-jwt-auth": "^2.4",
+        "illuminate/database": "^7.12"
     },
     "autoload": {
       "psr-4": {

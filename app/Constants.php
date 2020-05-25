@@ -23,7 +23,7 @@ if (!defined('FETCH_SUCC')) {
 }
 
 if (!defined('FETCH_EMPTY')) {
-  define('FETCH_EMPTY', 'Nothing to be fetched.');
+  define('FETCH_EMPTY', 'Resource could not be found.');
 }
 
 if (!defined('FETCH_ERR')) {
@@ -49,6 +49,28 @@ if (!defined('UPDATE_ERR')) {
   define('UPDATE_ERR', 'Error updating the data.');
 }
 
+if (!defined('UPDATE_EMPTY')) {
+  define('UPDATE_EMPTY', 'Nothing to be updated');
+}
+
+// Archive
+if (!defined('ARCHIVE_SUCC')) {
+  define('ARCHIVE_SUCC', 'Data archived successfully.');
+}
+
+if (!defined('ARCHIVE_ERR')) {
+  define('ARCHIVE_ERR', 'Error archiving the data.');
+}
+
+// Restore
+if (!defined('RESTORE_SUCC')) {
+  define('RESTORE_SUCC', 'Data restored successfully.');
+}
+
+if (!defined('RESTORE_ERR')) {
+  define('RESTORE_ERR', 'Error restoring the data.');
+}
+
 // Delete
 if (!defined('DELETE_SUCC')) {
   define('DELETE_SUCC', 'Data deleted successfully.');
@@ -59,8 +81,16 @@ if (!defined('DELETE_ERR')) {
 }
 
 // Validation
+if (!defined('APP_ERR')) {
+  define('APP_ERR', 'Application Error');
+}
+
 if (!defined('VLD_ERR')) {
-  define('VLD_ERR', 'Validation error');
+  define('VLD_ERR', 'Please check for field errors');
+}
+
+if (!defined('VLD_ERR_TYPE')) {
+  define('VLD_ERR_TYPE', 'Validation Error');
 }
 
 // Authentication

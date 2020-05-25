@@ -3,12 +3,16 @@ Create restful apis with a bliss using SlimPHP. Inspired by [crankedapps' slim-r
 
 ## What's included?
  - SlimPHP 3
- - Idiorm(ORM)
+ - Eloquent ORM
  - Dotenv
  - JWT Authentication
  - Respect Validation
  - Monolog
- - PHPUnit
+ - Custom Helpers
+   - Utilities
+   - Dates
+   - Crypto
+   - Email
 
 ## Todo
 
@@ -17,9 +21,8 @@ Create restful apis with a bliss using SlimPHP. Inspired by [crankedapps' slim-r
  - [ ] Sample API Documentation
 ### Implementation
  - [X] Dotenv
- - [X] Idiorm Sample CRUD fns
+ - [X] Eloquent
  - [X] Respect Validation
  - [X] JWT Authentication
- - [ ] Monolog
- - [ ] PHPUnit
+ - [X] Monolog
  

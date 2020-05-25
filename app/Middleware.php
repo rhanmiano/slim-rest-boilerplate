@@ -35,7 +35,7 @@ class Middleware {
               ->withheader('Content-Security-Policy', "default-src 'self';");
     });
 
-    $this->app->add(new JwtAuthentication([
+    /*$this->app->add(new JwtAuthentication([
       "attribute" => "jwt",
       "path" => "/",
       "algorithm" => getenv('JWT_ALGO'),
@@ -43,7 +43,11 @@ class Middleware {
       "error" => function ($request, $response, $arguments) {
           return $response->withJson([
               'success' => false,
-              'errors' => $arguments["message"]
+              'error' => array(
+                'type' => 'Authorization Error',
+                'message' => 'Unauthorized access. Token not found.',
+              ),
+              'action' => 'Please provide a valid bearer token.'
           ], 401);
       },
       "rules" => [
@@ -55,7 +59,7 @@ class Middleware {
             "passthrough" => ["OPTIONS"]
         ]),
       ]
-    ]));
+    ]));*/
 
     /**
      * Throw 404 for unknown routes instead of 401 from Authentication

@@ -2,12 +2,9 @@
 
 namespace App\Models;
 
-use ORM;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class BaseModel extends ORM{
-
-  public function __construct() {
-    ORM::configure(\App\Config\Config::db());
-  }
-
+class BaseModel extends Model{
+    use SoftDeletes;
 }

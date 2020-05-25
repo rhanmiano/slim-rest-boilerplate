@@ -5,7 +5,7 @@ namespace App\Controllers;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use App\Controllers\BaseCtrl;
-use App\Models\CustomerModel;
+use App\Models\CustomerModel as Customer;
 use Respect\Validation\Validator as v;
 use App\Helpers\UtilityHelper;
 
@@ -21,29 +21,30 @@ class CustomerCtrl extends BaseCtrl{
 
   public function all(Request $request, Response $response, $args) {
 
-    $customerModel = new CustomerModel();
-
-    $result = $customerModel->getAllCustomers();
+    $result = Customer::_all();
 
     if (!empty($result)) {
 
-      $this->retval['status']    = 'success';
-      $this->retval['message']   = FETCH_SUCC;
-      $this->retval['customers'] = $result;
+      $this->res['status']    = 'success';
+      $this->res['message']   = FETCH_SUCC;
+      $this->res['customers'] = $result;
+
+      $response->withStatus(200);
 
     } else {
 
-      $this->retval['status']    = 'failed';
-      $this->retval['message']   = FETCH_EMPTY;
-      $this->retval['customers'] = [];
+      $this->res['status']    = 'failed';
+      $this->res['message']   = FETCH_EMPTY;
+      $this->res['customers'] = [];
 
+      $response->withStatus(204);
     }
-
-    $response = $response->withStatus(200)
+    
+    $data = $response
       ->withHeader('Content-type', 'application/json')
-      ->withJson($this->retval);
+      ->withJson($this->res);
 
-    return $response;
+    return $data;
 
   }
 
@@ -52,29 +53,28 @@ class CustomerCtrl extends BaseCtrl{
 
     $id = (int)$args['id'];
 
-    $customerModel = new CustomerModel();
-
-    $result = $customerModel->getCustomerById($id);
+    $result = Customer::_byId($id);
 
     if (!empty($result)) {
 
-      $this->retval['status']    = 'success';
-      $this->retval['message']   = FETCH_SUCC;
-      $this->retval['customer'] = $result[0];
+      $this->res['status']   = 'success';
+      $this->res['message']  = FETCH_SUCC;
+      $this->res['customer'] = $result;
 
     } else {
 
-      $this->retval['status']    = 'failed';
-      $this->retval['message']   = FETCH_EMPTY;
-      $this->retval['customer'] = [];
+      $this->res['status']   = 'failed';
+      $this->res['message']  = FETCH_EMPTY;
+      $this->res['customer'] = null;
 
     }
 
-    $response = $response->withStatus(200)
+    $data = $response
+      ->withStatus(200)
       ->withHeader('Content-type', 'application/json')
-      ->withJson($this->retval);
+      ->withJson($this->res);
 
-    return $response;
+    return $data;
 
   }
 
@@ -91,38 +91,43 @@ class CustomerCtrl extends BaseCtrl{
 
     if ($validation->failed()) {
 
-      $this->retval['status']           = 'failed';
-      $this->retval['message']          = VLD_ERR;
-      $this->retval['errors']['fields'] = $validation->getErrors();
+      $this->res['status']          = 'failed';
+      $this->res['message']         = VLD_ERR;
+      $this->res['error']['type']   = VLD_ERR_TYPE;
+      $this->res['error']['fields'] = $validation->getErrors();
 
       $response = $response->withStatus(200)
       ->withHeader('Content-type', 'application/json')
-      ->withJson($this->retval);
+      ->withJson($this->res);
 
       return $response;
 
     }
 
-    $customerModel = new CustomerModel();
+    $result = Customer::_create($body_args);
 
-    $result = $customerModel->insertCustomer($body_args);
+    if ($result['qry_status']) {
 
-    if ($result['status']) {
-
-      $this->retval['status']  = 'success';
-      $this->retval['message'] = CREATE_SUCC;
+      $this->res['status']   = 'success';
+      $this->res['message']  = CREATE_SUCC;
+      $this->res['customer'] = Customer::_byId($result['id']);
+      $this->res['customer']['href'] = getenv('BASE_URL').'customer/'.$result['id'];
 
     } else {
 
-      $this->retval['status']  = 'failed';
-      $this->retval['message'] = CREATE_ERR;
-      $this->retval['errors'] = $result['errors'];
+      $this->res['status']  = 'failed';
+      $this->res['message'] = CREATE_ERR;
+
+      if (isset($result['errors']) && $result['errors']) {
+        $this->res['error']['type']    = APP_ERR;
+        $this->res['error']['message'] = $result['errors'];
+      }
 
     }    
 
     $response = $response->withStatus(200)
       ->withHeader('Content-type', 'application/json')
-      ->withJson($this->retval);
+      ->withJson($this->res);
 
     return $response;
 
@@ -141,37 +146,108 @@ class CustomerCtrl extends BaseCtrl{
 
     if ($validation->failed()) {
 
-      $this->retval['status']           = 'failed';
-      $this->retval['message']          = VLD_ERR;
-      $this->retval['errors']['fields'] = $validation->getErrors();
+      $this->res['status']          = 'failed';
+      $this->res['message']         = VLD_ERR;
+      $this->res['error']['type']   = VLD_ERR_TYPE;
+      $this->res['error']['fields'] = $validation->getErrors();
 
       $response = $response->withStatus(200)
       ->withHeader('Content-type', 'application/json')
-      ->withJson($this->retval);
+      ->withJson($this->res);
 
       return $response;
 
     }
 
-    $customerModel = new CustomerModel();
+    $result = Customer::_update($id, $body_args);
 
-    $result = $customerModel->updateCustomer($id, $body_args);
+    if ($result['qry_status']) {
 
-    if ($result) {
+      $this->res['status']  = 'success';
+      $this->res['message'] = UPDATE_SUCC;
 
-      $this->retval['status']  = 'success';
-      $this->retval['message'] = UPDATE_SUCC;
+      $this->res['customer'] = Customer::_byId($id);
+      $this->res['customer']['href'] = getenv('BASE_URL').'customer/'.$id;
 
     } else {
 
-      $this->retval['status']  = 'failed';
-      $this->retval['message'] = UPDATE_ERR;
+      $this->res['status']  = 'failed';
+      $this->res['message'] = isset($result['message']) ? $result['message'] : UPDATE_ERR;
+
+      if (isset($result['errors']) && $result['errors']) {
+        $this->res['error']['type']    = APP_ERR;
+        $this->res['error']['message'] = $result['errors'];
+      }
 
     }    
 
     $response = $response->withStatus(200)
       ->withHeader('Content-type', 'application/json')
-      ->withJson($this->retval);
+      ->withJson($this->res);
+
+    return $response;
+
+  }
+
+  public function archive(Request $request, Response $response, $args) {
+
+    $id = (int) $args['id'];
+
+    $result = Customer::_archive($id);
+
+    if ($result['qry_status']) {
+
+      $this->res['status']  = 'success';
+      $this->res['message'] = ARCHIVE_SUCC;
+
+    } else {
+
+      $this->res['status'] = 'failed';
+      $this->res['message'] = isset($result['message']) ? $result['message'] : ARCHIVE_ERR;
+
+      if (isset($result['errors']) && $result['errors']) {
+        $this->res['error']['type']    = APP_ERR;
+        $this->res['error']['message'] = $result['errors'];
+      }
+
+    }
+
+    $response = $response->withStatus(200)
+      ->withHeader('Content-type', 'application/json')
+      ->withJson($this->res);
+
+    return $response;
+
+  }
+
+  public function restore(Request $request, Response $response, $args) {
+
+    $id = (int) $args['id'];
+
+    $result = Customer::_restore($id);
+
+    if ($result['qry_status']) {
+
+      $this->res['status']  = 'success';
+      $this->res['message'] = RESTORE_SUCC;
+      $this->res['customer'] = Customer::_byId($id);
+      $this->res['customer']['href'] = getenv('BASE_URL').'customer/'.$id;
+
+    } else {
+
+      $this->res['status'] = 'failed';
+      $this->res['message'] = isset($result['message']) ? $result['message'] : RESTORE_ERR;
+
+      if (isset($result['errors']) && $result['errors']) {
+        $this->res['error']['type']    = APP_ERR;
+        $this->res['error']['message'] = $result['errors'];
+      }
+
+    }
+
+    $response = $response->withStatus(200)
+      ->withHeader('Content-type', 'application/json')
+      ->withJson($this->res);
 
     return $response;
 
@@ -179,27 +255,31 @@ class CustomerCtrl extends BaseCtrl{
 
   public function delete(Request $request, Response $response, $args) {
 
-    $id = (int)$args['id'];
+    $id = (int) $args['id'];
 
-    $customerModel = new CustomerModel();
+    $result = Customer::_delete($id);
 
-    $result = $customerModel->deleteCustomerById($id);
+    if ($result['qry_status']) {
 
-    if ($result) {
-
-      $this->retval['status']  = 'success';
-      $this->retval['message'] = DELETE_SUCC;
+      $this->res['status']  = 'success';
+      $this->res['message'] = DELETE_SUCC;
 
     } else {
 
-      $this->retval['status']  = 'failed';
-      $this->retval['message'] = DELETE_ERR;
+      $this->res['status']  = 'failed';
+      $this->res['message'] = isset($result['message']) ? $result['message'] : DELETE_ERR;
+
+      if (isset($result['errors']) && $result['errors']) {
+        $this->res['error']['type']    = APP_ERR;
+        $this->res['error']['message'] = $result['errors'];
+      }
+
 
     }    
 
     $response = $response->withStatus(200)
       ->withHeader('Content-type', 'application/json')
-      ->withJson($this->retval);
+      ->withJson($this->res);
 
     return $response;
 

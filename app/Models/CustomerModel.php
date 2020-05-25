@@ -2,64 +2,49 @@
 
 namespace App\Models;
 
-use ORM;
-use App\Models\BaseModel;
-
 class CustomerModel extends BaseModel {
+	protected $table = 'customers';
+	protected $hidden = ['password'];
 
-  public function getAllCustomers() {
+	public function _all() {
 
-    $result = ORM::for_table('customers')->find_array();
-
-    // do not include password in the result
-    foreach($result as $key => $value) {
-      unset($result[$key]['password']);  
-    }
+    $result = Self::all();
 
     return $result;
 
   }
 
-  public function getCustomerById($id) {
+  public function _byId($id) {
 
-    $result = ORM::for_table('customers')
-      ->where('id', $id)
-      ->find_array();
-
-    unset($result[0]['password']); // do not include password in the result
+    $result = Self::find($id);
 
     return $result;
 
   }
 
-  public function getCustomerByEmail($email) {
+  public function _byEmail($email) {
 
-    $result = ORM::for_table('customers')
-      ->where('email', $email)
-      ->find_array();
-
-    // unset($result[0]['password']); // do not include password in the result
+    $result = Self::find($id);
 
     return $result;
 
   }
 
-  public function insertCustomer($args) {
+  public function _create($args) {
 
     $errors = [];
-    // Sample of executing raw query
-    $qry1 = "
-      INSERT INTO customers 
-      (name, password, email, age)
-      VALUES (:name, :password, :email, :age) 
-    ";
 
-    $qry_params = (array) $args;
-    $qry_params['password'] = password_hash($qry_params['password'], PASSWORD_BCRYPT, array('cost' => 12));
+    $customer = new Self();
+
+    $args->password = password_hash($args->password, PASSWORD_BCRYPT, array('cost' => 12));
+    
+    foreach($args as $key => $value) {
+    	$customer->$key = $value;
+    }
 
     try {
 
-      $result['status'] = ORM::raw_execute($qry1, $qry_params); 
+      $result['qry_status'] = $customer->save(); 
 
     } catch (PDOException $e) {
 
@@ -68,11 +53,11 @@ class CustomerModel extends BaseModel {
     }
 
     // If ever we need last inserted id
-    $id = ORM::get_db()->lastInsertId();
+    $result['id'] = $customer->id;
 
     if (sizeof($errors) > 0) { // with errors
     
-      $result['status'] = false;
+      $result['qry_status'] = false;
       $result['errors'] = $errors;
 
     } else {
@@ -83,29 +68,150 @@ class CustomerModel extends BaseModel {
 
   }
 
-  public function updateCustomer($id, $args) {
+  public function _update($id, $args) {
 
-    $customer = ORM::for_table('Customers')
-      ->find_one($id);
+    $errors = [];
+
+    $customer = Self::find($id);
+
+    if(!$customer) {
+      $result['qry_status'] = false;
+      $result['message'] = FETCH_EMPTY;
+      
+      return $result;
+    }
 
     foreach ((array) $args as $key => $value) {
       $customer->$key = $value;
     }
 
-    $customer->set_expr('updated_at', 'now()');
+    if($customer->isClean()){
+      $result['qry_status'] = false;
+      $result['message'] = UPDATE_EMPTY;
+      
+      return $result;
+    }
 
-    $result = $customer->save();
+    try {
+
+      $result['qry_status'] = $customer->save(); 
+
+    } catch (PDOException $e) {
+
+      $errors[] = $e->getMessages;
+
+    }
+
+    if (sizeof($errors) > 0) { // with errors
+    
+      $result['qry_status'] = false;
+      $result['errors'] = $errors;
+
+    }
 
     return $result;
 
   }
 
-  public function deleteCustomerById($id) {
+  public function _archive($id) {
 
-    $customer = ORM::for_table('Customers')
-      ->find_one($id);
+    $errors = [];
 
-    $result = $customer->delete();
+    $customer = Self::find($id);
+
+    if (!$customer) {
+
+      $result['qry_status'] = false;
+      $result['message'] = FETCH_EMPTY;
+      
+      return $result;
+    }
+
+    try {
+
+      $result['qry_status'] = $customer->delete(); 
+
+    } catch (PDOException $e) {
+
+      $errors[] = $e->getMessages;
+
+    }
+
+    if (sizeof($errors) > 0) { // with errors
+    
+      $result['qry_status'] = false;
+      $result['errors'] = $errors;
+
+    }
+
+    return $result;
+
+  }
+
+  public function _restore($id) {
+
+    $errors = [];
+
+    $customer = Self::onlyTrashed($id);
+
+    if (!$customer) {
+
+      $result['qry_status'] = false;
+      $result['message'] = FETCH_EMPTY;
+      
+      return $result;
+    }
+
+    try {
+
+      $result['qry_status'] = $customer->restore(); 
+
+    } catch (PDOException $e) {
+
+      $errors[] = $e->getMessages;
+
+    }
+
+    if (sizeof($errors) > 0) { // with errors
+    
+      $result['qry_status'] = false;
+      $result['errors'] = $errors;
+
+    }
+
+    return $result;
+
+  }
+
+  public function _delete($id) {
+
+    $errors = [];
+
+    $customer = Self::find($id);
+
+    if(!$customer) {
+      $result['qry_status'] = false;
+      $result['message'] = FETCH_EMPTY;
+      
+      return $result;
+    }
+    
+    try {
+
+      $result['qry_status'] = $customer->forceDelete(); 
+
+    } catch (PDOException $e) {
+
+      $errors[] = $e->getMessages;
+
+    }
+
+    if (sizeof($errors) > 0) { // with errors
+    
+      $result['qry_status'] = false;
+      $result['errors'] = $errors;
+
+    }
 
     return $result;
 
