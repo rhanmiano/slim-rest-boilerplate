@@ -23,13 +23,11 @@ class CustomerCtrl extends BaseCtrl{
 
     $result = Customer::_all();
 
-    if (!empty($result)) {
+    if ($result) {
 
       $this->res['status']    = 'success';
       $this->res['message']   = FETCH_SUCC;
       $this->res['customers'] = $result;
-
-      $response->withStatus(200);
 
     } else {
 
@@ -37,12 +35,10 @@ class CustomerCtrl extends BaseCtrl{
       $this->res['message']   = FETCH_EMPTY;
       $this->res['customers'] = [];
 
-      $response->withStatus(204);
     }
     
     $data = $response
-      ->withHeader('Content-type', 'application/json')
-      ->withJson($this->res);
+      ->withJson($this->res, 200);
 
     return $data;
 
@@ -55,7 +51,7 @@ class CustomerCtrl extends BaseCtrl{
 
     $result = Customer::_byId($id);
 
-    if (!empty($result)) {
+    if ($result) {
 
       $this->res['status']   = 'success';
       $this->res['message']  = FETCH_SUCC;
@@ -70,9 +66,7 @@ class CustomerCtrl extends BaseCtrl{
     }
 
     $data = $response
-      ->withStatus(200)
-      ->withHeader('Content-type', 'application/json')
-      ->withJson($this->res);
+      ->withJson($this->res, 200);
 
     return $data;
 
@@ -96,9 +90,8 @@ class CustomerCtrl extends BaseCtrl{
       $this->res['error']['type']   = VLD_ERR_TYPE;
       $this->res['error']['fields'] = $validation->getErrors();
 
-      $response = $response->withStatus(200)
-      ->withHeader('Content-type', 'application/json')
-      ->withJson($this->res);
+      $response = $response
+        ->withJson($this->res, 400);
 
       return $response;
 
@@ -116,18 +109,22 @@ class CustomerCtrl extends BaseCtrl{
     } else {
 
       $this->res['status']  = 'failed';
-      $this->res['message'] = CREATE_ERR;
+      $this->res['message'] = isset($result['message']) ? $result['message'] : CREATE_ERR;
 
       if (isset($result['errors']) && $result['errors']) {
         $this->res['error']['type']    = APP_ERR;
         $this->res['error']['message'] = $result['errors'];
+
+        $response = $response
+          ->withJson($this->res, 500);
+
+        return $response;
       }
 
-    }    
+    }
 
-    $response = $response->withStatus(200)
-      ->withHeader('Content-type', 'application/json')
-      ->withJson($this->res);
+    $response = $response
+      ->withJson($this->res, 201);
 
     return $response;
 
@@ -151,9 +148,8 @@ class CustomerCtrl extends BaseCtrl{
       $this->res['error']['type']   = VLD_ERR_TYPE;
       $this->res['error']['fields'] = $validation->getErrors();
 
-      $response = $response->withStatus(200)
-      ->withHeader('Content-type', 'application/json')
-      ->withJson($this->res);
+      $response = $response      
+      ->withJson($this->res, 200);
 
       return $response;
 
@@ -177,13 +173,17 @@ class CustomerCtrl extends BaseCtrl{
       if (isset($result['errors']) && $result['errors']) {
         $this->res['error']['type']    = APP_ERR;
         $this->res['error']['message'] = $result['errors'];
+
+        $response = $response
+          ->withJson($this->res, 500);
+
+        return $response;
       }
 
     }    
 
-    $response = $response->withStatus(200)
-      ->withHeader('Content-type', 'application/json')
-      ->withJson($this->res);
+    $response = $response      
+      ->withJson($this->res, 200);
 
     return $response;
 
@@ -208,13 +208,17 @@ class CustomerCtrl extends BaseCtrl{
       if (isset($result['errors']) && $result['errors']) {
         $this->res['error']['type']    = APP_ERR;
         $this->res['error']['message'] = $result['errors'];
+
+        $response = $response
+          ->withJson($this->res, 500);
+
+        return $response;
       }
 
     }
 
-    $response = $response->withStatus(200)
-      ->withHeader('Content-type', 'application/json')
-      ->withJson($this->res);
+    $response = $response      
+      ->withJson($this->res, 200);
 
     return $response;
 
@@ -241,13 +245,17 @@ class CustomerCtrl extends BaseCtrl{
       if (isset($result['errors']) && $result['errors']) {
         $this->res['error']['type']    = APP_ERR;
         $this->res['error']['message'] = $result['errors'];
+
+        $response = $response
+          ->withJson($this->res, 500);
+
+        return $response;
       }
 
     }
 
-    $response = $response->withStatus(200)
-      ->withHeader('Content-type', 'application/json')
-      ->withJson($this->res);
+    $response = $response
+      ->withJson($this->res, 200);
 
     return $response;
 
@@ -272,14 +280,18 @@ class CustomerCtrl extends BaseCtrl{
       if (isset($result['errors']) && $result['errors']) {
         $this->res['error']['type']    = APP_ERR;
         $this->res['error']['message'] = $result['errors'];
+
+        $response = $response
+          ->withJson($this->res, 500);
+
+        return $response;
       }
 
 
     }    
 
-    $response = $response->withStatus(200)
-      ->withHeader('Content-type', 'application/json')
-      ->withJson($this->res);
+    $response = $response      
+      ->withJson($this->res, 200);
 
     return $response;
 

@@ -82,7 +82,7 @@ if (!defined('DELETE_ERR')) {
 
 // Validation
 if (!defined('APP_ERR')) {
-  define('APP_ERR', 'Application Error');
+  define('APP_ERR', 'Application/Server Error');
 }
 
 if (!defined('VLD_ERR')) {
