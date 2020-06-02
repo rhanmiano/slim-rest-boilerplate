@@ -8,8 +8,8 @@ Options -Indexes
 
   # Base traffic on index.php
   RewriteEngine on
-  RewriteRule ^$ public/ [L]
-  RewriteRule (.*) public/$1 [L]
+  RewriteRule ^$ api/ [L]
+  RewriteRule (.*) api/$1 [L]
 
 </IfModule>
 
