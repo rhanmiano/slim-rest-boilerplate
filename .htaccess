@@ -4,7 +4,7 @@ AddDefaultCharset utf-8
 # Disable Directory Listing
 Options -Indexes
 
-<ifModule mod_rewrite.c>
+<IfModule mod_rewrite.so>
 
   # Base traffic on index.php
   RewriteEngine on
