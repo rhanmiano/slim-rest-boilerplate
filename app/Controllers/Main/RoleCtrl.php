@@ -1,42 +1,72 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\Main;
 
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Message\ResponseInterface as Response;
 use App\Controllers\BaseCtrl;
-use App\Models\CustomerModel as Customer;
-use Respect\Validation\Validator as v;
 use App\Helpers\UtilityHelper;
+use App\Models\Main\RoleModel as Role;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Respect\Validation\Validator as v;
 
-class CustomerCtrl extends BaseCtrl{
-  
+class RoleCtrl extends BaseCtrl {
+
   public function test(Request $request, Response $response, $args) {
 
     $helper = new UtilityHelper();
 
-    $helper->_hello();
+    if (getenv('ENVIRONMENT') !== 'production') {
+      $helper->_hello();
+    } else {
+      $this->res['message'] = FETCH_EMPTY;
+      $data                 = $response
+        ->withJson($this->res, 404);
+
+      return $data;
+    }
 
   }
 
   public function all(Request $request, Response $response, $args) {
 
-    $result = Customer::_all();
+    $getData = UtilityHelper::_sanitize_array($request->getQueryParams());
 
-    if ($result) {
+    if (sizeof($getData) > 0 && $getData['page'] && $getData['per_page']) {
 
-      $this->res['status']    = 'success';
-      $this->res['message']   = FETCH_SUCC;
-      $this->res['customers'] = $result;
+      if (!is_numeric($getData['page']) || !is_numeric($getData['per_page'])) {
+        $this->res['status']  = 'failed';
+        $this->res['message'] = PAGINATION_ERR;
+        $data                 = $response
+          ->withJson($this->res, 200);
+
+        return $data;
+        die();
+      }
+
+      $result = Role::paginate($getData['per_page'], ['*'], 'page', $getData['page']);
+      $result->withPath(getenv('BASE_URL') . 'roles');
+      $result->appends(['limit' => $getData['per_page']]);
 
     } else {
 
-      $this->res['status']    = 'failed';
-      $this->res['message']   = FETCH_EMPTY;
-      $this->res['customers'] = [];
+      $result = Role::all();
 
     }
-    
+
+    if (sizeof($result) > 0) {
+
+      $this->res['status']  = 'success';
+      $this->res['message'] = FETCH_SUCC;
+      $this->res['data']    = $result;
+
+    } else {
+
+      $this->res['status']  = 'failed';
+      $this->res['message'] = FETCH_EMPTY;
+      $this->res['data']    = [];
+
+    }
+
     $data = $response
       ->withJson($this->res, 200);
 
@@ -44,24 +74,23 @@ class CustomerCtrl extends BaseCtrl{
 
   }
 
-
   public function byId(Request $request, Response $response, $args) {
 
-    $id = (int)$args['id'];
+    $id = (int) UtilityHelper::_sanitize($args['id']);
 
-    $result = Customer::_byId($id);
+    $result = Role::find($id);
 
     if ($result) {
 
-      $this->res['status']   = 'success';
-      $this->res['message']  = FETCH_SUCC;
-      $this->res['customer'] = $result;
+      $this->res['status']  = 'success';
+      $this->res['message'] = FETCH_SUCC;
+      $this->res['data']    = $result;
 
     } else {
 
-      $this->res['status']   = 'failed';
-      $this->res['message']  = FETCH_EMPTY;
-      $this->res['customer'] = null;
+      $this->res['status']  = 'failed';
+      $this->res['message'] = FETCH_EMPTY;
+      $this->res['data']    = null;
 
     }
 
@@ -74,37 +103,35 @@ class CustomerCtrl extends BaseCtrl{
 
   public function create(Request $request, Response $response, $args) {
 
-    $body_args = json_decode($request->getBody());
-
+    $body_args  = (array) $request->getParsedBody();
     $validation = $this->validator->validate($body_args, [
-      'name'     => v::notEmpty()->alpha(),
-      'password' => v::noWhitespace()->notEmpty(),
-      'email'    => v::noWhitespace()->notEmpty()->email(),
-      'age'      => v::noWhitespace()->notEmpty()->numeric()
+      'name' => v::notEmpty()
+        ->alnum(' ')
+        ->fieldUnique('App\\Models\\Main\\RoleModel')
     ]);
 
     if ($validation->failed()) {
 
-      $this->res['status']          = 'failed';
-      $this->res['message']         = VLD_ERR;
-      $this->res['error']['type']   = VLD_ERR_TYPE;
-      $this->res['error']['fields'] = $validation->getErrors();
+      $this->res['status']  = 'failed';
+      $this->res['message'] = VLD_ERR;
+      $this->res['error']   = $validation->getErrors();
 
       $response = $response
-        ->withJson($this->res, 400);
+        ->withJson($this->res, 200);
 
       return $response;
 
     }
 
-    $result = Customer::_create($body_args);
+    $body_args = UtilityHelper::_sanitize_array($request->getParsedBody());
+    $result    = Role::_create($body_args);
 
     if ($result['qry_status']) {
 
-      $this->res['status']   = 'success';
-      $this->res['message']  = CREATE_SUCC;
-      $this->res['customer'] = Customer::_byId($result['id']);
-      $this->res['customer']['href'] = getenv('BASE_URL').'customer/'.$result['id'];
+      $this->res['status']       = 'success';
+      $this->res['message']      = CREATE_SUCC;
+      $this->res['data']         = Role::find($result['id']);
+      $this->res['data']['href'] = getenv('BASE_URL') . 'role/' . $result['id'];
 
     } else {
 
@@ -132,38 +159,38 @@ class CustomerCtrl extends BaseCtrl{
 
   public function update(Request $request, Response $response, $args) {
 
-    $id = (int)$args['id'];
-    $body_args = json_decode($request->getBody());
+    $id        = (int) UtilityHelper::_sanitize($args['id']);
+    $body_args = $request->getParsedBody();
 
     $validation = $this->validator->validate($body_args, [
-      'name' => v::notEmpty()->alpha(),
-      'email' => v::noWhitespace()->notEmpty()->email(),
-      'age' => v::noWhitespace()->notEmpty()->numeric()
+      'name' => v::notEmpty()
+        ->alnum(' ')
+        ->fieldUniqueUpdate('App\\Models\\Main\\RoleModel', $id)
     ]);
 
     if ($validation->failed()) {
 
-      $this->res['status']          = 'failed';
-      $this->res['message']         = VLD_ERR;
-      $this->res['error']['type']   = VLD_ERR_TYPE;
-      $this->res['error']['fields'] = $validation->getErrors();
+      $this->res['status']  = 'failed';
+      $this->res['message'] = VLD_ERR;
+      $this->res['error']   = $validation->getErrors();
 
-      $response = $response      
-      ->withJson($this->res, 200);
+      $response = $response
+        ->withJson($this->res, 200);
 
       return $response;
 
     }
 
-    $result = Customer::_update($id, $body_args);
+    $body_args = UtilityHelper::_sanitize_array($request->getParsedBody());
+    $result    = Role::_update($id, $body_args);
 
     if ($result['qry_status']) {
 
       $this->res['status']  = 'success';
       $this->res['message'] = UPDATE_SUCC;
 
-      $this->res['customer'] = Customer::_byId($id);
-      $this->res['customer']['href'] = getenv('BASE_URL').'customer/'.$id;
+      $this->res['data']         = Role::find($id);
+      $this->res['data']['href'] = getenv('BASE_URL') . 'role/' . $id;
 
     } else {
 
@@ -180,9 +207,9 @@ class CustomerCtrl extends BaseCtrl{
         return $response;
       }
 
-    }    
+    }
 
-    $response = $response      
+    $response = $response
       ->withJson($this->res, 200);
 
     return $response;
@@ -191,9 +218,9 @@ class CustomerCtrl extends BaseCtrl{
 
   public function archive(Request $request, Response $response, $args) {
 
-    $id = (int) $args['id'];
+    $id = (int) UtilityHelper::_sanitize($args['id']);
 
-    $result = Customer::_archive($id);
+    $result = Role::_archive($id);
 
     if ($result['qry_status']) {
 
@@ -202,7 +229,7 @@ class CustomerCtrl extends BaseCtrl{
 
     } else {
 
-      $this->res['status'] = 'failed';
+      $this->res['status']  = 'failed';
       $this->res['message'] = isset($result['message']) ? $result['message'] : ARCHIVE_ERR;
 
       if (isset($result['errors']) && $result['errors']) {
@@ -217,7 +244,7 @@ class CustomerCtrl extends BaseCtrl{
 
     }
 
-    $response = $response      
+    $response = $response
       ->withJson($this->res, 200);
 
     return $response;
@@ -226,20 +253,20 @@ class CustomerCtrl extends BaseCtrl{
 
   public function restore(Request $request, Response $response, $args) {
 
-    $id = (int) $args['id'];
+    $id = (int) UtilityHelper::_sanitize($args['id']);
 
-    $result = Customer::_restore($id);
+    $result = Role::_restore($id);
 
     if ($result['qry_status']) {
 
-      $this->res['status']  = 'success';
-      $this->res['message'] = RESTORE_SUCC;
-      $this->res['customer'] = Customer::_byId($id);
-      $this->res['customer']['href'] = getenv('BASE_URL').'customer/'.$id;
+      $this->res['status']       = 'success';
+      $this->res['message']      = RESTORE_SUCC;
+      $this->res['data']         = Role::find($id);
+      $this->res['data']['href'] = getenv('BASE_URL') . 'role/' . $id;
 
     } else {
 
-      $this->res['status'] = 'failed';
+      $this->res['status']  = 'failed';
       $this->res['message'] = isset($result['message']) ? $result['message'] : RESTORE_ERR;
 
       if (isset($result['errors']) && $result['errors']) {
@@ -263,9 +290,9 @@ class CustomerCtrl extends BaseCtrl{
 
   public function delete(Request $request, Response $response, $args) {
 
-    $id = (int) $args['id'];
+    $id = (int) UtilityHelper::_sanitize($args['id']);
 
-    $result = Customer::_delete($id);
+    $result = Role::_delete($id);
 
     if ($result['qry_status']) {
 
@@ -287,10 +314,9 @@ class CustomerCtrl extends BaseCtrl{
         return $response;
       }
 
+    }
 
-    }    
-
-    $response = $response      
+    $response = $response
       ->withJson($this->res, 200);
 
     return $response;

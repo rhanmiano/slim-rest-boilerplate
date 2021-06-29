@@ -2,15 +2,19 @@
 
 namespace App\Controllers\Authentication;
 
-use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 use Firebase\JWT\JWT;
 
 use App\Controllers\BaseCtrl;
-use App\Models\CustomerModel;
 use Respect\Validation\Validator as v;
 use App\Helpers\UtilityHelper;
+
+use App\Models\UserModel as User;
+use App\Models\Main\UserModel as User;
+use App\Models\Main\UserLoginInfoModel as UserLoginInfo;
+use App\Models\Main\UserVerificationModel as UserVerification;
 
 class LoginCtrl extends BaseCtrl {
 
@@ -22,7 +26,7 @@ class LoginCtrl extends BaseCtrl {
 
   }
 
-  public function login(Request $request, Response $response, $args) {
+  public function signin(Request $request, Response $response, $args) {
 
     $customerModel = new CustomerModel();
 
@@ -30,7 +34,7 @@ class LoginCtrl extends BaseCtrl {
 
     $validation = $this->validator->validate($bodyArgs, [
       'email'    => v::noWhitespace()->notEmpty()->email(),
-      'password' => v::noWhitespace()->notEmpty(),
+      'password' => v::noWhitespace()->notEmpty()
     ]);
 
     if ($validation->failed()) {
@@ -50,7 +54,7 @@ class LoginCtrl extends BaseCtrl {
 
     $customer = $customerModel->getCustomerByEmail($bodyArgs->email);
 
-    if(empty($customer[0])) {
+    if (empty($customer[0])) {
 
       $this->retval['status']  = 'failed';
       $this->retval['message'] = EMAIL_NULL;
@@ -64,7 +68,7 @@ class LoginCtrl extends BaseCtrl {
 
     }
 
-    if(!password_verify($bodyArgs->password, $customer[0]['password'])) {
+    if (!password_verify($bodyArgs->password, $customer[0]['password'])) {
       $this->retval['status']  = 'failed';
       $this->retval['message'] = PASSWORD_INVLD;
 
@@ -93,18 +97,18 @@ class LoginCtrl extends BaseCtrl {
 
   public function tokenCreate($data) {
 
-    $expires = new \DateTime("+".getenv('JWT_EXPIRES')." minutes"); // token expiration
+    $expires = new \DateTime('+' . getenv('JWT_EXPIRES') . ' minutes'); // token expiration
 
     $payload = [
-      "iat" => (new \DateTime())->getTimeStamp(), // initialized unix timestamp
-      "exp" => $expires->getTimeStamp(), // expiration unix timestamp
-      "sub" => $data // internal user identifier
+      'iat' => (new \DateTime())->getTimeStamp(), // initialized unix timestamp
+      'exp' => $expires->getTimeStamp(),          // expiration unix timestamp
+      'sub' => $data                             // internal user identifier
     ];
 
-    $token = JWT::encode($payload, getenv('JWT_SECRET') , getenv('JWT_ALGO'));
-    
+    $token = JWT::encode($payload, getenv('JWT_SECRET'), getenv('JWT_ALGO'));
+
     return [
-      'token' => $token,
+      'token'   => $token,
       'expires' => $expires->getTimestamp()
     ];
 

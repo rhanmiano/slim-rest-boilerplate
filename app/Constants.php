@@ -1,6 +1,7 @@
 <?php
 
 /** PATHS **/
+
 if (!defined('ROOT_PATH')) {
   define('ROOT_PATH', dirname(dirname(__FILE__)));
 }
@@ -9,6 +10,15 @@ if (!defined('APP_PATH')) {
   define('APP_PATH', ROOT_PATH . '/app');
 }
 
+/** Functions **/
+
+if (!function_exists('dd')) {
+  function dd($input) {
+    echo '<pre>';
+    die(var_dump($input));
+  }
+
+}
 
 /** SYSTEM MESSAGES **/
 
@@ -38,7 +48,6 @@ if (!defined('CREATE_SUCC')) {
 if (!defined('CREATE_ERR')) {
   define('CREATE_ERR', 'Error inserting the data.');
 }
-
 
 // Update
 if (!defined('UPDATE_SUCC')) {
@@ -82,26 +91,48 @@ if (!defined('DELETE_ERR')) {
 
 // Validation
 if (!defined('APP_ERR')) {
-  define('APP_ERR', 'Application/Server Error');
+  define('APP_ERR', 'Application/Server error.');
 }
 
 if (!defined('VLD_ERR')) {
-  define('VLD_ERR', 'Please check for field errors');
+  define('VLD_ERR', 'Please check for field errors.');
 }
 
 if (!defined('VLD_ERR_TYPE')) {
-  define('VLD_ERR_TYPE', 'Validation Error');
+  define('VLD_ERR_TYPE', 'Validation Error.');
 }
 
 // Authentication
-if (!defined('EMAIL_NULL')) {
-  define('EMAIL_NULL', 'Username doesn\'t exist in the system');
+if (!defined('AUTH_ERR_TYPE')) {
+  define('AUTH_ERR_TYPE', 'Authentication Error.');
+}
+
+if (!defined('USER_NULL')) {
+  define('USER_NULL', 'User account doesn\'t exist in the system.');
 }
 
 if (!defined('PASSWORD_INVLD')) {
   define('PASSWORD_INVLD', 'Invalid Password');
 }
 
-if (!defined('LOGIN_SUCC')) {
-  define('LOGIN_SUCC', 'You\'ve login successfully');
+if (!defined('SIGNIN_SUCC')) {
+  define('SIGNIN_SUCC', 'You\'ve signin successfully.');
+}
+
+if (!defined('SIGNOUT_SUCC')) {
+  define('SIGNOUT_SUCC', 'You\'ve signout successfully.');
+}
+
+// Pagination
+if (!defined('PAGINATION_ERR')) {
+  define('PAGINATION_ERR', 'Invalid pagination parameter value.');
+}
+
+// Verification
+if (!defined('VERIFY_SUCC')) {
+  define('VERIFY_SUCC', 'Verification process was successful.');
+}
+
+if (!defined('VERIFY_ERR')) {
+  define('VERIFY_ERR', 'Verification process was unsuccessful.');
 }

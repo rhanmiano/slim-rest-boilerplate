@@ -6,8 +6,22 @@ class AuthenticationRoute {
 
   public function __construct($app) {
 
-    $app->get('/test-login', 'App\Controllers\Authentication\LoginCtrl:test');
-    $app->post('/login', 'App\Controllers\Authentication\LoginCtrl:login');
+    $pathCtrl = 'App\Controllers\Authentication\AuthCtrl';
+
+    $app->get(
+      '/auth/test',
+      $pathCtrl . ':test'
+    );
+
+    $app->post(
+      '/auth/signin',
+      $pathCtrl . ':signin'
+    );
+
+    $app->post(
+      '/auth/signout',
+      $pathCtrl . ':signout'
+    );
 
   }
 
